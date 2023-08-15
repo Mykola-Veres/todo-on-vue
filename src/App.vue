@@ -1,17 +1,32 @@
 <script setup>
+import { ref } from 'vue'
 import TheHeader from './components/TheHeader.vue'
 import TheFooter from './components/TheFooter.vue'
+import TheActivities from './components/TheActivities.vue'
+
+const activities = ref(['Coding', 'Reading', 'Training'])
+
+function createActivity(activity) {
+  activities.value.push(activity)
+}
+
+function deleteActivity(activity) {
+  activities.value.splice(activities.value.indexOf(activity), 1)
+}
 </script>
 
 <template>
-  <TheHeader />
+  <body>
+    <TheHeader />
 
-  <main class="flex flex-col flex-grow">
-    <h1 class="text-5xl font-[900] underline uppercase">Hello world!</h1>
-    <h1 className="text-3xl font-bold underline uppercase">Hello world!</h1>
-  </main>
+    <main class="flex flex-col flex-grow">
+      <TheActivities
+        :activities="activities"
+        @create-activity="createActivity"
+        @delete-activity="deleteActivity"
+      />
+    </main>
 
-  <TheFooter />
+    <TheFooter />
+  </body>
 </template>
-
-<style scoped></style>
