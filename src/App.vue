@@ -1,32 +1,52 @@
-<script setup>
-import { ref } from 'vue'
-import TheHeader from './components/TheHeader.vue'
-import TheFooter from './components/TheFooter.vue'
-import TheActivities from './components/TheActivities.vue'
-
-const activities = ref(['Coding', 'Reading', 'Training'])
-
-function createActivity(activity) {
-  activities.value.push(activity)
-}
-
-function deleteActivity(activity) {
-  activities.value.splice(activities.value.indexOf(activity), 1)
-}
-</script>
-
 <template>
   <body>
     <TheHeader />
-
-    <main class="flex flex-col flex-grow">
-      <TheActivities
-        :activities="activities"
-        @create-activity="createActivity"
-        @delete-activity="deleteActivity"
-      />
+    <main>
+      <form>
+        <input v-model="task" placeholder="Enter the task" />
+        <button classname="text-green-500" @click="addTask(task)">ADD</button>
+        <ul>
+          <li v-for="(task, index) in tasks" :key="index">
+            {{ task }}
+            <button @click="removeTask(index)">Delete</button>
+            <button @click="startEditing(index)">Edit</button>
+            <div v-show="editingTasks.includes(index)">
+              <input placeholder="Enter the task" class="h-6 w-6" v-model="editedTasks[index]" />
+              <button @click="confirmEdit(index)">Confirm</button>
+            </div>
+          </li>
+        </ul>
+      </form>
     </main>
-
     <TheFooter />
   </body>
 </template>
+
+<script>
+import { mapState, mapMutations } from 'vuex'
+
+export default {
+  data() {
+    return {
+      task: '',
+      editingTasks: [],
+      editedTasks: {}
+    }
+  },
+  computed: {
+    ...mapState(['tasks'])
+  },
+  methods: {
+    ...mapMutations(['addTask', 'removeTask', 'editTask']),
+    startEditing(index) {
+      this.editingTasks.push(index)
+      this.editedTasks[index] = this.tasks[index]
+    },
+    confirmEdit(index) {
+      this.editTask({ index, editedTask: this.editedTasks[index] })
+      this.editingTasks.splice(this.editingTasks.indexOf(index), 1)
+      delete this.editedTasks[index]
+    }
+  }
+}
+</script>
